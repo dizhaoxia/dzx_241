@@ -1,0 +1,181 @@
+<template>
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="logo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+        <span class="logo-text">AnnotateX</span>
+      </div>
+    </div>
+
+    <div class="topbar-center">
+      <el-upload
+        :auto-upload="false"
+        :show-file-list="false"
+        accept=".jpg,.jpeg,.png"
+        :on-change="handleFileChange"
+      >
+        <button class="topbar-btn" title="上传图片">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <span>上传图片</span>
+        </button>
+      </el-upload>
+
+      <div class="divider"></div>
+
+      <button class="topbar-btn" @click="handleExport" title="导出JSON">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <span>导出</span>
+      </button>
+
+      <el-upload
+        :auto-upload="false"
+        :show-file-list="false"
+        accept=".json"
+        :on-change="handleImport"
+      >
+        <button class="topbar-btn" title="导入JSON">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <span>导入</span>
+        </button>
+      </el-upload>
+
+      <div class="divider"></div>
+
+      <button class="topbar-btn danger" @click="handleClearAll" title="清空所有">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        </svg>
+        <span>清空</span>
+      </button>
+    </div>
+
+    <div class="topbar-right">
+      <span class="zoom-label">{{ Math.round(zoomLevel * 100) }}%</span>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { useCanvasState } from '../composables/useCanvasState'
+import { useAnnotationData } from '../composables/useAnnotationData'
+
+const { zoomLevel, loadImage } = useCanvasState()
+const { handleExport, handleImport, handleClearAll } = useAnnotationData()
+
+const handleFileChange = (file) => {
+  if (file && file.raw) {
+    loadImage(file.raw)
+  }
+}
+</script>
+
+<style scoped>
+.topbar {
+  display: flex;
+  align-items: center;
+  height: var(--topbar-height);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent);
+}
+
+.logo-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.5px;
+}
+
+.topbar-center {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 auto;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.zoom-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+  margin: 0 4px;
+}
+
+.topbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-family: 'Noto Sans SC', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.topbar-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+
+.topbar-btn.danger:hover {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--danger);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+:deep(.el-upload) {
+  display: inline-flex;
+}
+</style>
