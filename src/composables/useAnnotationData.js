@@ -120,6 +120,8 @@ export function useAnnotationData() {
           cornerSize: 8,
           transparentCorners: false,
           borderColor: '#06b6d4',
+          perPixelTargetFind: true,
+          targetFindTolerance: 10,
         })
       } else if (ann.type === 'text' || ann.type === 'label') {
         fabricObj = new fabric.Textbox(ann.label || '文本', {
@@ -144,6 +146,7 @@ export function useAnnotationData() {
         fabricObj._annotationId = ann.id
         fabricObj._annotationType = ann.type
         fabricCanvas.add(fabricObj)
+        fabricObj.setCoords()
       }
     })
 

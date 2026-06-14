@@ -20,18 +20,47 @@ import { useCanvasState } from './composables/useCanvasState'
 const { setActiveTool, canvas, removeAnnotation, setSelectedObject } = useCanvasState()
 
 const handleKeyDown = (e) => {
-  if (e.key === 'Delete') {
+  if (e.key === 'Delete' || e.key === 'Backspace') {
     const active = document.activeElement
     if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.contentEditable === 'true')) {
       return
     }
     if (canvas.value) {
-      const obj = canvas.value.getActiveObject()
-      if (obj && obj._annotationId) {
-        canvas.value.remove(obj)
-        canvas.value.discardActiveObject()
+      const activeObj = canvas.value.getActiveObject()
+      if (activeObj) {
+        e.preventDefault()
+
+        if (activeObj.type === 'activeSelection') {
+          const objects = activeObj.getObjects()
+          const idsToRemove = new Set()
+          objects.forEach(obj => {
+            if (obj._annotationId) {
+              idsToRemove.add(obj._annotationId)
+            }
+          })
+          canvas.value.discardActiveObject()
+          idsToRemove.forEach(id => {
+            const allObjects = canvas.value.getObjects()
+            allObjects.forEach(obj => {
+              if (obj._annotationId === id) {
+                canvas.value.remove(obj)
+              }
+            })
+            removeAnnotation(id)
+          })
+        } else if (activeObj._annotationId) {
+          const id = activeObj._annotationId
+          const allObjects = canvas.value.getObjects()
+          allObjects.forEach(obj => {
+            if (obj._annotationId === id) {
+              canvas.value.remove(obj)
+            }
+          })
+          canvas.value.discardActiveObject()
+          removeAnnotation(id)
+        }
+
         canvas.value.renderAll()
-        removeAnnotation(obj._annotationId)
         setSelectedObject(null)
       }
     }

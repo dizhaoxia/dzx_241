@@ -133,12 +133,16 @@ export function usePolygon() {
         transparentCorners: false,
         borderColor: '#06b6d4',
         padding: 2,
+        perPixelTargetFind: true,
+        targetFindTolerance: 10,
       })
 
       polygon._annotationId = id
       polygon._annotationType = 'polygon'
 
       fabricCanvas.add(polygon)
+      polygon.setCoords()
+      fabricCanvas.setActiveObject(polygon)
       fabricCanvas.renderAll()
 
       addAnnotation({
