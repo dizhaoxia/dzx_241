@@ -11,6 +11,8 @@ const state = reactive({
   loadImageFn: null,
   distributeHorizontalFn: null,
   distributeVerticalFn: null,
+  annotationsVisible: true,
+  fillOpacity: 0.25,
 })
 
 export function useCanvasState() {
@@ -82,6 +84,18 @@ export function useCanvasState() {
     return false
   }
 
+  const toggleAnnotationsVisible = () => {
+    state.annotationsVisible = !state.annotationsVisible
+  }
+
+  const setAnnotationsVisible = (visible) => {
+    state.annotationsVisible = visible
+  }
+
+  const setFillOpacity = (opacity) => {
+    state.fillOpacity = Math.max(0, Math.min(1, opacity))
+  }
+
   return {
     ...toRefs(state),
     setActiveTool,
@@ -99,5 +113,8 @@ export function useCanvasState() {
     setDistributeVerticalFn,
     distributeHorizontal,
     distributeVertical,
+    toggleAnnotationsVisible,
+    setAnnotationsVisible,
+    setFillOpacity,
   }
 }

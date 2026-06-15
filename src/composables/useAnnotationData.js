@@ -4,8 +4,15 @@ import { saveToLocal, loadFromLocal, clearLocal } from '@/utils/storage'
 import { exportJSON, importJSON } from '@/utils/export'
 import { ElMessage } from 'element-plus'
 
+const hexToRgba = (hex, alpha) => {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
+
 export function useAnnotationData() {
-  const { canvas, annotations, setAnnotations, clearAnnotations, setActiveTool } = useCanvasState()
+  const { canvas, annotations, setAnnotations, clearAnnotations, setActiveTool, fillOpacity } = useCanvasState()
 
   const buildExportData = () => {
     const fabricCanvas = canvas.value
@@ -99,7 +106,7 @@ export function useAnnotationData() {
           top: ann.coordinates.y,
           width: ann.coordinates.width,
           height: ann.coordinates.height,
-          fill: 'rgba(6, 182, 212, 0.15)',
+          fill: hexToRgba(ann.color || '#06b6d4', fillOpacity.value),
           stroke: ann.color || '#06b6d4',
           strokeWidth: 2,
           strokeUniform: true,
@@ -116,7 +123,7 @@ export function useAnnotationData() {
         })
       } else if (ann.type === 'polygon') {
         fabricObj = new fabric.Polygon(ann.coordinates.points, {
-          fill: 'rgba(6, 182, 212, 0.25)',
+          fill: hexToRgba(ann.color || '#06b6d4', fillOpacity.value),
           stroke: ann.color || '#06b6d4',
           strokeWidth: 2,
           strokeUniform: true,

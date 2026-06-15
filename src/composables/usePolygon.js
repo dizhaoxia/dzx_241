@@ -3,8 +3,15 @@ import { watch } from 'vue'
 import { useCanvasState } from './useCanvasState'
 import { generateId } from '@/utils/export'
 
+const hexToRgba = (hex, alpha) => {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
+
 export function usePolygon() {
-  const { canvas, activeTool, addAnnotation } = useCanvasState()
+  const { canvas, activeTool, addAnnotation, fillOpacity } = useCanvasState()
 
   let points = []
   let tempLines = []
@@ -285,7 +292,7 @@ export function usePolygon() {
     const id = generateId()
 
     const polygon = new fabric.Polygon(polygonPoints, {
-      fill: 'rgba(6, 182, 212, 0.25)',
+      fill: hexToRgba('#06b6d4', fillOpacity.value),
       stroke: '#06b6d4',
       strokeWidth: 2,
       strokeUniform: true,

@@ -24,6 +24,8 @@ import { usePolygon } from '../composables/usePolygon'
 import { useTextTool } from '../composables/useTextTool'
 import { useCanvasZoom } from '../composables/useCanvasZoom'
 import { useSnapAlignment } from '../composables/useSnapAlignment'
+import { useAnnotationDisplay } from '../composables/useAnnotationDisplay'
+import { usePolygonEdit } from '../composables/usePolygonEdit'
 
 const canvasRef = ref(null)
 const wrapperRef = ref(null)
@@ -34,6 +36,8 @@ const { initPolygon, destroyPolygon } = usePolygon()
 const { initTextTool, destroyTextTool } = useTextTool()
 const { initZoom, destroyZoom } = useCanvasZoom()
 const { initSnapAlignment, destroySnapAlignment, distributeHorizontal, distributeVertical } = useSnapAlignment()
+const { initAnnotationDisplay, destroyAnnotationDisplay } = useAnnotationDisplay()
+const { initPolygonEdit, destroyPolygonEdit } = usePolygonEdit()
 
 let backgroundImage = null
 let dragOverHandler = null
@@ -85,6 +89,8 @@ const initCanvas = () => {
   initTextTool(fabricCanvas)
   initZoom(fabricCanvas)
   initSnapAlignment(fabricCanvas)
+  initAnnotationDisplay(fabricCanvas)
+  initPolygonEdit(fabricCanvas)
   setDistributeHorizontalFn(distributeHorizontal)
   setDistributeVerticalFn(distributeVertical)
 
@@ -181,6 +187,8 @@ onBeforeUnmount(() => {
   destroyTextTool()
   destroyZoom()
   destroySnapAlignment()
+  destroyAnnotationDisplay()
+  destroyPolygonEdit()
   window.removeEventListener('resize', handleResize)
 
   const wrapper = wrapperRef.value

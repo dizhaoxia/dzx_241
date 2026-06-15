@@ -86,6 +86,37 @@
         </svg>
         <span>清空</span>
       </button>
+
+      <div class="divider"></div>
+
+      <button class="topbar-btn" :class="{ active: !annotationsVisible }" @click="handleToggleVisible" title="显示/隐藏标注 (Ctrl+H)">
+        <svg v-if="annotationsVisible" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+        <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+        <span>{{ annotationsVisible ? '隐藏' : '显示' }}</span>
+      </button>
+
+      <div class="opacity-control" title="标注填充透明度">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+          <line x1="3" y1="21" x2="21" y2="3"/>
+        </svg>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.05"
+          :value="fillOpacity"
+          @input="handleOpacityChange"
+          class="opacity-slider"
+        />
+        <span class="opacity-value">{{ Math.round(fillOpacity * 100) }}%</span>
+      </div>
     </div>
 
     <div class="topbar-right">
@@ -99,8 +130,18 @@ import { useCanvasState } from '../composables/useCanvasState'
 import { useAnnotationData } from '../composables/useAnnotationData'
 import { ElMessage } from 'element-plus'
 
-const { zoomLevel, loadImage, distributeHorizontal, distributeVertical } = useCanvasState()
+const { zoomLevel, loadImage, distributeHorizontal, distributeVertical, annotationsVisible, fillOpacity, toggleAnnotationsVisible, setFillOpacity } = useCanvasState()
 const { handleExport, handleImport, handleClearAll } = useAnnotationData()
+
+const handleToggleVisible = () => {
+  toggleAnnotationsVisible()
+  ElMessage.success(annotationsVisible.value ? '已隐藏所有标注' : '已显示所有标注')
+}
+
+const handleOpacityChange = (e) => {
+  const value = parseFloat(e.target.value)
+  setFillOpacity(value)
+}
 
 const handleFileChange = (file) => {
   if (file && file.raw) {
@@ -214,6 +255,72 @@ const handleDistributeVertical = () => {
   background: rgba(245, 158, 11, 0.1);
   color: var(--danger);
   border-color: rgba(245, 158, 11, 0.3);
+}
+
+.topbar-btn.active {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.opacity-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+}
+
+.opacity-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.opacity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.opacity-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+.opacity-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease;
+}
+
+.opacity-slider::-moz-range-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+.opacity-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  min-width: 32px;
+  text-align: right;
 }
 
 :deep(.el-upload) {

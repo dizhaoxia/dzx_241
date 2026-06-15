@@ -18,7 +18,7 @@ import PropertyPanel from './components/PropertyPanel.vue'
 import { useCanvasState } from './composables/useCanvasState'
 import { ElMessage } from 'element-plus'
 
-const { setActiveTool, canvas, removeAnnotation, setSelectedObject, distributeHorizontal, distributeVertical } = useCanvasState()
+const { setActiveTool, canvas, removeAnnotation, setSelectedObject, distributeHorizontal, distributeVertical, toggleAnnotationsVisible, annotationsVisible } = useCanvasState()
 
 const handleKeyDown = (e) => {
   if (e.key === 'Delete' || e.key === 'Backspace') {
@@ -88,6 +88,12 @@ const handleKeyDown = (e) => {
     } else {
       ElMessage.success('已垂直等距分布')
     }
+  }
+
+  if (e.ctrlKey && (e.key === 'H' || e.key === 'h')) {
+    e.preventDefault()
+    toggleAnnotationsVisible()
+    ElMessage.success(annotationsVisible.value ? '已隐藏所有标注' : '已显示所有标注')
   }
 }
 
