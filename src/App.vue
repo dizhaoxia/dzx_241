@@ -16,8 +16,9 @@ import ToolBar from './components/ToolBar.vue'
 import CanvasArea from './components/CanvasArea.vue'
 import PropertyPanel from './components/PropertyPanel.vue'
 import { useCanvasState } from './composables/useCanvasState'
+import { ElMessage } from 'element-plus'
 
-const { setActiveTool, canvas, removeAnnotation, setSelectedObject } = useCanvasState()
+const { setActiveTool, canvas, removeAnnotation, setSelectedObject, distributeHorizontal, distributeVertical } = useCanvasState()
 
 const handleKeyDown = (e) => {
   if (e.key === 'Delete' || e.key === 'Backspace') {
@@ -67,6 +68,26 @@ const handleKeyDown = (e) => {
   }
   if (e.key === 'Escape') {
     setActiveTool('select')
+  }
+
+  if (e.ctrlKey && e.shiftKey && (e.key === 'H' || e.key === 'h')) {
+    e.preventDefault()
+    const result = distributeHorizontal()
+    if (!result) {
+      ElMessage.warning('请至少选中 3 个标注框')
+    } else {
+      ElMessage.success('已水平等距分布')
+    }
+  }
+
+  if (e.ctrlKey && e.shiftKey && (e.key === 'V' || e.key === 'v')) {
+    e.preventDefault()
+    const result = distributeVertical()
+    if (!result) {
+      ElMessage.warning('请至少选中 3 个标注框')
+    } else {
+      ElMessage.success('已垂直等距分布')
+    }
   }
 }
 

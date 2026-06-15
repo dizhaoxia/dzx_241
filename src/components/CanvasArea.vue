@@ -23,15 +23,17 @@ import { useRectangle } from '../composables/useRectangle'
 import { usePolygon } from '../composables/usePolygon'
 import { useTextTool } from '../composables/useTextTool'
 import { useCanvasZoom } from '../composables/useCanvasZoom'
+import { useSnapAlignment } from '../composables/useSnapAlignment'
 
 const canvasRef = ref(null)
 const wrapperRef = ref(null)
-const { imageLoaded, setCanvas, setSelectedObject, setImageLoaded, setActiveTool, activeTool, canvas, annotations, setLoadImageFn } = useCanvasState()
+const { imageLoaded, setCanvas, setSelectedObject, setImageLoaded, setActiveTool, activeTool, canvas, annotations, setLoadImageFn, setDistributeHorizontalFn, setDistributeVerticalFn } = useCanvasState()
 
 const { initRectangle, destroyRectangle } = useRectangle()
 const { initPolygon, destroyPolygon } = usePolygon()
 const { initTextTool, destroyTextTool } = useTextTool()
 const { initZoom, destroyZoom } = useCanvasZoom()
+const { initSnapAlignment, destroySnapAlignment } = useSnapAlignment()
 
 let backgroundImage = null
 let dragOverHandler = null
@@ -82,6 +84,9 @@ const initCanvas = () => {
   initPolygon(fabricCanvas)
   initTextTool(fabricCanvas)
   initZoom(fabricCanvas)
+  initSnapAlignment(fabricCanvas)
+  setDistributeHorizontalFn(distributeHorizontal)
+  setDistributeVerticalFn(distributeVertical)
 
   setLoadImageFn(loadImageToCanvas)
 }
@@ -175,6 +180,7 @@ onBeforeUnmount(() => {
   destroyPolygon()
   destroyTextTool()
   destroyZoom()
+  destroySnapAlignment()
   window.removeEventListener('resize', handleResize)
 
   const wrapper = wrapperRef.value

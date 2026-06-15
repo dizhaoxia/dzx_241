@@ -57,6 +57,28 @@
 
       <div class="divider"></div>
 
+      <button class="topbar-btn align-btn" @click="handleDistributeHorizontal" title="水平等距分布 (Ctrl+Shift+H)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="4" y1="6" x2="4" y2="18"/>
+          <line x1="12" y1="4" x2="12" y2="20"/>
+          <line x1="20" y1="6" x2="20" y2="18"/>
+          <line x1="2" y1="12" x2="22" y2="12" stroke-dasharray="2,2"/>
+        </svg>
+        <span>水平等距</span>
+      </button>
+
+      <button class="topbar-btn align-btn" @click="handleDistributeVertical" title="垂直等距分布 (Ctrl+Shift+V)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="6" y1="4" x2="18" y2="4"/>
+          <line x1="4" y1="12" x2="20" y2="12"/>
+          <line x1="6" y1="20" x2="18" y2="20"/>
+          <line x1="12" y1="2" x2="12" y2="22" stroke-dasharray="2,2"/>
+        </svg>
+        <span>垂直等距</span>
+      </button>
+
+      <div class="divider"></div>
+
       <button class="topbar-btn danger" @click="handleClearAll" title="清空所有">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="3 6 5 6 21 6"/>
@@ -75,13 +97,32 @@
 <script setup>
 import { useCanvasState } from '../composables/useCanvasState'
 import { useAnnotationData } from '../composables/useAnnotationData'
+import { ElMessage } from 'element-plus'
 
-const { zoomLevel, loadImage } = useCanvasState()
+const { zoomLevel, loadImage, distributeHorizontal, distributeVertical } = useCanvasState()
 const { handleExport, handleImport, handleClearAll } = useAnnotationData()
 
 const handleFileChange = (file) => {
   if (file && file.raw) {
     loadImage(file.raw)
+  }
+}
+
+const handleDistributeHorizontal = () => {
+  const result = distributeHorizontal()
+  if (!result) {
+    ElMessage.warning('请至少选中 3 个标注框')
+  } else {
+    ElMessage.success('已水平等距分布')
+  }
+}
+
+const handleDistributeVertical = () => {
+  const result = distributeVertical()
+  if (!result) {
+    ElMessage.warning('请至少选中 3 个标注框')
+  } else {
+    ElMessage.success('已垂直等距分布')
   }
 }
 </script>

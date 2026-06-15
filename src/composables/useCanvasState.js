@@ -9,6 +9,8 @@ const state = reactive({
   imageLoaded: false,
   annotations: [],
   loadImageFn: null,
+  distributeHorizontalFn: null,
+  distributeVerticalFn: null,
 })
 
 export function useCanvasState() {
@@ -58,6 +60,28 @@ export function useCanvasState() {
     }
   }
 
+  const setDistributeHorizontalFn = (fn) => {
+    state.distributeHorizontalFn = fn
+  }
+
+  const setDistributeVerticalFn = (fn) => {
+    state.distributeVerticalFn = fn
+  }
+
+  const distributeHorizontal = () => {
+    if (state.distributeHorizontalFn) {
+      return state.distributeHorizontalFn()
+    }
+    return false
+  }
+
+  const distributeVertical = () => {
+    if (state.distributeVerticalFn) {
+      return state.distributeVerticalFn()
+    }
+    return false
+  }
+
   return {
     ...toRefs(state),
     setActiveTool,
@@ -71,5 +95,9 @@ export function useCanvasState() {
     setZoomLevel,
     setLoadImageFn,
     loadImage,
+    setDistributeHorizontalFn,
+    setDistributeVerticalFn,
+    distributeHorizontal,
+    distributeVertical,
   }
 }
