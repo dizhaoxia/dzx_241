@@ -77,6 +77,7 @@ const initCanvas = () => {
   })
 
   setCanvas(fabricCanvas)
+  window._fabricCanvas = fabricCanvas
   initRectangle(fabricCanvas)
   initPolygon(fabricCanvas)
   initTextTool(fabricCanvas)

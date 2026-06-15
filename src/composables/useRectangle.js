@@ -42,10 +42,12 @@ export function useRectangle() {
       })
 
       const id = generateId()
-      currentRect._annotationId = id
-      currentRect._annotationType = 'rect'
+      currentRect.set('_annotationId', id)
+      currentRect.set('_annotationType', 'rect')
+      currentRect.set('_isAnnotation', true)
 
       fabricCanvas.add(currentRect)
+      currentRect.setCoords()
       fabricCanvas.renderAll()
     }
 

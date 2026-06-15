@@ -11,7 +11,7 @@ export function useAnnotationData() {
     const fabricCanvas = canvas.value
     if (!fabricCanvas) return null
 
-    const annotationObjects = fabricCanvas.getObjects().filter(obj => obj._annotationId)
+    const annotationObjects = fabricCanvas.getObjects().filter(obj => obj._isAnnotation || obj._annotationId)
 
     const data = {
       version: '1.0',
@@ -33,11 +33,13 @@ export function useAnnotationData() {
             height: obj.height * obj.scaleY,
           }
         } else if (obj._annotationType === 'polygon') {
-          const points = obj.points.map(p => ({
-            x: p.x - obj.pathOffset.x,
-            y: p.y - obj.pathOffset.y,
-          }))
-          base.coordinates = { points }
+          let polygonPoints = []
+          if (obj._polygonPoints && Array.isArray(obj._polygonPoints)) {
+            polygonPoints = obj._polygonPoints
+          } else if (obj.points) {
+            polygonPoints = obj.points.map(p => ({ x: p.x, y: p.y }))
+          }
+          base.coordinates = { points: polygonPoints }
         } else if (obj._annotationType === 'text' || obj._annotationType === 'label') {
           base.coordinates = { x: obj.left, y: obj.top }
           base.label = obj.text || ''
@@ -83,7 +85,7 @@ export function useAnnotationData() {
 
     const objects = fabricCanvas.getObjects().slice()
     objects.forEach(obj => {
-      if (obj._annotationId) {
+      if (obj._isAnnotation || obj._annotationId) {
         fabricCanvas.remove(obj)
       }
     })
@@ -102,27 +104,36 @@ export function useAnnotationData() {
           strokeWidth: 2,
           strokeUniform: true,
           selectable: true,
+          evented: true,
+          hasControls: true,
+          hasBorders: true,
           cornerColor: '#06b6d4',
           cornerStyle: 'circle',
           cornerSize: 8,
           transparentCorners: false,
           borderColor: '#06b6d4',
+          padding: 2,
         })
       } else if (ann.type === 'polygon') {
         fabricObj = new fabric.Polygon(ann.coordinates.points, {
-          fill: 'rgba(6, 182, 212, 0.15)',
+          fill: 'rgba(6, 182, 212, 0.25)',
           stroke: ann.color || '#06b6d4',
           strokeWidth: 2,
           strokeUniform: true,
           selectable: true,
+          evented: true,
+          hasControls: true,
+          hasBorders: true,
           cornerColor: '#06b6d4',
           cornerStyle: 'circle',
           cornerSize: 8,
           transparentCorners: false,
           borderColor: '#06b6d4',
-          perPixelTargetFind: true,
-          targetFindTolerance: 10,
+          padding: 2,
+          originX: 'left',
+          originY: 'top',
         })
+        fabricObj.set('_polygonPoints', ann.coordinates.points)
       } else if (ann.type === 'text' || ann.type === 'label') {
         fabricObj = new fabric.Textbox(ann.label || '文本', {
           left: ann.coordinates.x,
@@ -134,6 +145,9 @@ export function useAnnotationData() {
           padding: ann.type === 'label' ? 4 : 6,
           editable: true,
           selectable: true,
+          evented: true,
+          hasControls: true,
+          hasBorders: true,
           cornerColor: '#06b6d4',
           cornerStyle: 'circle',
           cornerSize: 8,
@@ -143,8 +157,9 @@ export function useAnnotationData() {
       }
 
       if (fabricObj) {
-        fabricObj._annotationId = ann.id
-        fabricObj._annotationType = ann.type
+        fabricObj.set('_annotationId', ann.id)
+        fabricObj.set('_annotationType', ann.type)
+        fabricObj.set('_isAnnotation', true)
         fabricCanvas.add(fabricObj)
         fabricObj.setCoords()
       }
@@ -159,11 +174,16 @@ export function useAnnotationData() {
     const fabricCanvas = canvas.value
     if (!fabricCanvas) return
 
-    const objects = fabricCanvas.getObjects().slice()
-    objects.forEach(obj => {
-      if (obj._annotationId) {
-        fabricCanvas.remove(obj)
+    const allObjects = fabricCanvas.getObjects()
+    const toRemove = []
+    for (let i = allObjects.length - 1; i >= 0; i--) {
+      const obj = allObjects[i]
+      if (obj._isAnnotation || obj._annotationId) {
+        toRemove.push(obj)
       }
+    }
+    toRemove.forEach(obj => {
+      fabricCanvas.remove(obj)
     })
 
     fabricCanvas.discardActiveObject()

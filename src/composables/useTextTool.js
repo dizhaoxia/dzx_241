@@ -36,12 +36,17 @@ export function useTextTool() {
         cornerSize: 8,
         transparentCorners: false,
         borderColor: '#06b6d4',
+        hasControls: true,
+        hasBorders: true,
+        evented: true,
       })
 
-      textbox._annotationId = id
-      textbox._annotationType = 'text'
+      textbox.set('_annotationId', id)
+      textbox.set('_annotationType', 'text')
+      textbox.set('_isAnnotation', true)
 
       fabricCanvas.add(textbox)
+      textbox.setCoords()
       fabricCanvas.setActiveObject(textbox)
       textbox.enterEditing()
       textbox.selectAll()
@@ -66,7 +71,7 @@ export function useTextTool() {
 
   const addTextToAnnotation = (fabricCanvas, annotationObj, pointer) => {
     if (annotationObj._labelAdded) return
-    annotationObj._labelAdded = true
+    annotationObj.set('_labelAdded', true)
 
     const label = new fabric.Textbox('标签', {
       left: annotationObj.left,
@@ -83,12 +88,18 @@ export function useTextTool() {
       cornerSize: 6,
       transparentCorners: false,
       borderColor: '#06b6d4',
+      hasControls: true,
+      hasBorders: true,
+      evented: true,
     })
 
-    label._annotationId = annotationObj._annotationId
-    label._annotationType = 'label'
+    const id = annotationObj._annotationId
+    label.set('_annotationId', id)
+    label.set('_annotationType', 'label')
+    label.set('_isAnnotation', true)
 
     fabricCanvas.add(label)
+    label.setCoords()
     fabricCanvas.setActiveObject(label)
     label.enterEditing()
     label.selectAll()
