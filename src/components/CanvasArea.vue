@@ -33,7 +33,7 @@ const { initRectangle, destroyRectangle } = useRectangle()
 const { initPolygon, destroyPolygon } = usePolygon()
 const { initTextTool, destroyTextTool } = useTextTool()
 const { initZoom, destroyZoom } = useCanvasZoom()
-const { initSnapAlignment, destroySnapAlignment } = useSnapAlignment()
+const { initSnapAlignment, destroySnapAlignment, distributeHorizontal, distributeVertical } = useSnapAlignment()
 
 let backgroundImage = null
 let dragOverHandler = null

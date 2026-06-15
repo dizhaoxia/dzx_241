@@ -291,16 +291,27 @@ export function useSnapAlignment() {
     guideLines = []
   }
 
+  const getSelectedAnnotationObjects = () => {
+    if (!fabricCanvasRef) return []
+    const activeObj = fabricCanvasRef.getActiveObject()
+    if (!activeObj) return []
+
+    let selectedObjects = []
+
+    if (activeObj.type === 'activeSelection') {
+      selectedObjects = activeObj.getObjects()
+    } else {
+      selectedObjects = [activeObj]
+    }
+
+    const mainObjects = selectedObjects.filter((o) => o._isAnnotation && o._annotationType !== 'label')
+
+    return mainObjects
+  }
+
   const distributeHorizontal = () => {
     if (!fabricCanvasRef) return false
-    const activeObj = fabricCanvasRef.getActiveObject()
-    let objects = []
-
-    if (activeObj && activeObj.type === 'activeSelection') {
-      objects = activeObj.getObjects().filter((o) => o._isAnnotation)
-    } else {
-      objects = fabricCanvasRef.getActiveObjects().filter((o) => o._isAnnotation)
-    }
+    const objects = getSelectedAnnotationObjects()
 
     if (objects.length < 3) return false
 
@@ -327,12 +338,14 @@ export function useSnapAlignment() {
         break
       }
       const deltaX = currentLeft - bounds.left
-      if (obj.type === 'polygon') {
-        obj.set('left', obj.left + deltaX)
-      } else {
-        obj.set('left', currentLeft)
-      }
+      const labelObj = findAssociatedLabel(obj)
+
+      obj.set('left', obj.left + deltaX)
       obj.setCoords()
+      if (labelObj) {
+        labelObj.set('left', labelObj.left + deltaX)
+        labelObj.setCoords()
+      }
       currentLeft += bounds.width + gap
     }
 
@@ -342,14 +355,7 @@ export function useSnapAlignment() {
 
   const distributeVertical = () => {
     if (!fabricCanvasRef) return false
-    const activeObj = fabricCanvasRef.getActiveObject()
-    let objects = []
-
-    if (activeObj && activeObj.type === 'activeSelection') {
-      objects = activeObj.getObjects().filter((o) => o._isAnnotation)
-    } else {
-      objects = fabricCanvasRef.getActiveObjects().filter((o) => o._isAnnotation)
-    }
+    const objects = getSelectedAnnotationObjects()
 
     if (objects.length < 3) return false
 
@@ -376,17 +382,27 @@ export function useSnapAlignment() {
         break
       }
       const deltaY = currentTop - bounds.top
-      if (obj.type === 'polygon') {
-        obj.set('top', obj.top + deltaY)
-      } else {
-        obj.set('top', currentTop)
-      }
+      const labelObj = findAssociatedLabel(obj)
+
+      obj.set('top', obj.top + deltaY)
       obj.setCoords()
+      if (labelObj) {
+        labelObj.set('top', labelObj.top + deltaY)
+        labelObj.setCoords()
+      }
       currentTop += bounds.height + gap
     }
 
     fabricCanvasRef.renderAll()
     return true
+  }
+
+  const findAssociatedLabel = (mainObj) => {
+    if (!fabricCanvasRef || !mainObj._annotationId) return null
+    const allObjects = fabricCanvasRef.getObjects()
+    return allObjects.find(
+      (o) => o._annotationId === mainObj._annotationId && o._annotationType === 'label' && o !== mainObj
+    ) || null
   }
 
   const initSnapAlignment = (fabricCanvas) => {
